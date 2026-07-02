@@ -86,39 +86,7 @@ Entire lab deployable in minutes from a single `terraform apply`, with security 
 
 ## 🏛️ Architecture
 
-```
-Internet
-    │
-    ▼
-┌─────────────────────────────────────────────────────────────┐
-│               VPC: Cloud Threat Detection Lab                │
-│                        10.0.0.0/16                           │
-│                                                              │
-│  ┌──────────────────────┐      ┌────────────────────────┐   │
-│  │    Public Subnet      │      │    Private Subnet       │   │
-│  │    10.0.1.0/24        │      │    10.0.2.0/24          │   │
-│  │                       │      │                         │   │
-│  │  ┌────────────────┐   │      │  ┌──────────────────┐  │   │
-│  │  │  attacker-box  │───┼─────►│  │  victim-server   │  │   │
-│  │  │  10.0.1.26     │   │      │  │  10.0.2.154      │  │   │
-│  │  │  t3.micro      │   │      │  │  t3.micro        │  │   │
-│  │  └────────────────┘   │      │  └──────────────────┘  │   │
-│  └──────────────────────┘      └────────────────────────┘   │
-│                                                              │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │                 Detection Layer                      │    │
-│  │  VPC Flow Logs ──► CloudWatch /threat-lab/flowlogs   │    │
-│  │  CloudTrail    ──► S3 + CloudWatch                   │    │
-│  │  GuardDuty     ──► Findings (Portscan, RootUsage...) │    │
-│  └─────────────────────────────────────────────────────┘    │
-│                                                              │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │              Response Layer (Phase 2)                │    │
-│  │  EventBridge ──► Lambda ──► Swap SG to isolated-sg  │    │
-│  │  SNS ──► Email alert to operator                    │    │
-│  └─────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────┘
-```
+![Architecture Diagram](docs/architecture-diagram.png)
 
 ---
 

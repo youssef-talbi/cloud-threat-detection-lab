@@ -50,6 +50,11 @@ Internet
 | Public Subnet | 10.0.1.0/24 (us-east-1a) |
 | Private Subnet | 10.0.2.0/24 (us-east-1a) |
 
+
+## VPC Setup
+![VPC Created](evidence/01-vpc-created.png)
+
+
 ### 2. Security Groups
 
 **victim-sg** (`sg-0fddfdfc4f769b5ed`)
@@ -80,6 +85,10 @@ Internet
 | Public IP | 3.239.121.213 | None |
 | AMI | Amazon Linux 2023 | Amazon Linux 2023 |
 
+
+## EC2 Instances Running
+![EC2 Instances](evidence/02-ec2-instances-running.png)
+
 ### 4. VPC Flow Logs
 
 | Parameter | Value |
@@ -88,6 +97,10 @@ Internet
 | Traffic Type | ALL (Accept + Reject) |
 | Destination | CloudWatch Logs |
 | Log Group | /threat-lab/flowlogs |
+
+
+## VPC Flow Logs — CloudWatch
+![Flow Logs](evidence/10-cloudwatch-flowlogs.png
 
 ### 5. CloudTrail
 
@@ -116,11 +129,20 @@ nmap -p 1-1000 -A -v -Pn 10.0.2.154
 **Result:** Port 22/tcp open — OpenSSH 8.7 (protocol 2.0) detected.  
 SSH host keys fingerprinted: ECDSA and ED25519.
 
+## Nmap Scan — Terminal Output
+![Nmap Scan](evidence/05-nmap-scan-terminal.png)
+
+
 **GuardDuty Finding Generated:**
 - Title: `An outbound portscan was detected from EC2 instance i-0a69be300ed7e7681`
 - Severity: **Medium**
 - Type: `Recon:EC2/Portscan`
 - Resource: EC2 Instance `i-0a69be300ed7e7681`
+
+## GuardDuty Finding
+![GuardDuty](evidence/06-guardduty-findings.png)
+
+
 
 ### Attack 2 — SSH Brute Force (Netcat flood + Nmap ssh-brute)
 
@@ -143,6 +165,12 @@ done
 
 **Result:** 200 concurrent TCP connections to port 22 generated sufficient volume  
 for GuardDuty to detect the brute force pattern via VPC Flow Logs analysis.
+
+
+## SSH Brute Force — Terminal Output
+![SSH Brute Force](evidence/12-nc-flood-terminal.png)
+
+
 
 **GuardDuty Findings Generated:**
 - Title: `i-0a69be300ed7e7681 is performing SSH brute force attacks against 10.0.2.154`
@@ -178,6 +206,9 @@ Four findings confirmed at end of Phase 1:
 | Outbound portscan from attacker-box | Medium | Recon:EC2/Portscan | Nmap simulation |
 | Root credentials used for API call | Low | Policy:IAMUser/RootCredentialUsage | CloudTrail |
 
+
+## GuardDuty — 4 Findings Confirmed
+![GuardDuty Findings](evidence/13-guardduty-4-findings.png)
 ---
 
 ## VPC Flow Logs — CloudWatch Evidence
