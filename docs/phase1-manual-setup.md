@@ -10,7 +10,7 @@ Every resource was provisioned, configured, and validated manually.
 
 ## Architecture Overview
 
-![Architecture](docs/Phase1-Architecture-Overview.png)
+![Architecture](Phase1-Architecture-Overview.png)
 
 ---
 
