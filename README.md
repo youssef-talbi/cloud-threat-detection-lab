@@ -86,13 +86,8 @@ Entire lab deployable in minutes from a single `terraform apply`, with security 
 
 ## 🏛️ Architecture
 
-<<<<<<< HEAD
-![Architecture Diagram](docs/architecture-diagram.png)
-=======
 
 ![Architecture Diagram](docs/architecture-diagram.png)
-
->>>>>>> 14d712bddba967ffa0b7f3566ddf8cc0dcd0899c
 
 ---
 

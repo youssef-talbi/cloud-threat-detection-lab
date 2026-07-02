@@ -10,30 +10,7 @@ Every resource was provisioned, configured, and validated manually.
 
 ## Architecture Overview
 
-```
-Internet
-    │
-    ▼
-┌─────────────────────────────────────────────────┐
-│           VPC: Cloud Threat Detection Lab        │
-│                   10.0.0.0/16                    │
-│                                                  │
-│  ┌─────────────────────┐  ┌──────────────────┐  │
-│  │   Public Subnet      │  │  Private Subnet  │  │
-│  │   10.0.1.0/24        │  │  10.0.2.0/24     │  │
-│  │                      │  │                  │  │
-│  │  ┌───────────────┐   │  │  ┌───────────┐  │  │
-│  │  │ attacker-box  │───┼──┼─►│victim-srv │  │  │
-│  │  │ 10.0.1.26     │   │  │  │10.0.2.154 │  │  │
-│  │  │ t3.micro      │   │  │  │ t3.micro  │  │  │
-│  │  └───────────────┘   │  │  └───────────┘  │  │
-│  └─────────────────────┘  └──────────────────┘  │
-│                                                  │
-│  VPC Flow Logs ──► CloudWatch: /threat-lab/flowlogs
-│  CloudTrail   ──► S3 + CloudWatch               │
-│  GuardDuty    ──► Analyzing all above sources    │
-└─────────────────────────────────────────────────┘
-```
+![Architecture](docs/Phase1-Architecture-Overview.png)
 
 ---
 
@@ -100,7 +77,7 @@ Internet
 
 
 ## VPC Flow Logs — CloudWatch
-![Flow Logs](evidence/10-cloudwatch-flowlogs.png
+![Flow Logs](evidence/07-vpc-flowlogs-enabled.png)
 
 ### 5. CloudTrail
 
@@ -218,6 +195,10 @@ during the Nmap scan at `2026-07-02T08:32:04.000Z`.
 Logs show bidirectional TCP flows across multiple ports — confirming active reconnaissance  
 was recorded at the network layer, independently of GuardDuty.
 
+
+
+## VPC Flow Logs — CloudWatch
+![Flow Logs](evidence/10-cloudwatch-flowlogs.png)
 ---
 
 ## Key Takeaways from Phase 1
