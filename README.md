@@ -50,21 +50,24 @@ A real attack at 3 AM would go unnoticed until someone manually checks the conso
 
 ---
 
-### 🔹 Phase 2 — Serverless Automated Response 🚧 `IN PROGRESS`
+### 🔹 Phase 2 — Serverless Automated Response ✅ `COMPLETE`
 
-**The problem this phase addresses:**  
-Manual detection without automated response is not enough.
+**The problem this phase addresses:**
+Manual detection without automated response is not enough. A real attack at 3 AM would go unnoticed until an engineer logs in.
 
-**What will be built:**
+**What was built:**
 - Amazon EventBridge rule capturing every GuardDuty finding in real time
-- AWS Lambda (Python/Boto3) that automatically replaces the compromised instance's Security Group with `isolated-sg` (zero inbound, zero outbound)
-- Amazon SNS sending an immediate email alert to the operator
-- CloudWatch dashboard visualizing findings and response events
+- AWS Lambda (Python/Boto3) automatically replacing the compromised instance's Security Group with `isolated-sg` (zero inbound, zero outbound)
+- Amazon SNS delivering a structured email alert to the operator instantly
+- IAM Role with least-privilege permissions scoped only to EC2 and SNS actions
 
-**Expected outcome:**  
-Compromised instance isolated in under 30 seconds from detection, with full audit trail.
+**Real results confirmed:**
+- GuardDuty High severity finding (`UnauthorizedAccess:EC2/SSHBruteForce`) triggered the full pipeline
+- `victim-server` isolated automatically — Security Group swapped to `isolated-sg`
+- Email alert received at **2026-07-05 14:04:32 UTC** with full finding details
+- **Time from detection to isolation: under 30 seconds**
 
-→ [Phase 2 Documentation](docs/phase2-automated-response.md) *(coming soon)*
+→ [Full Phase 2 Documentation & Evidence](docs/phase2-automated-response.md)
 
 ---
 
@@ -108,20 +111,46 @@ Entire lab deployable in minutes from a single `terraform apply`, with security 
 
 ```
 cloud-threat-detection-lab/
-├── README.md                          ← You are here
+├── README.md                              ← You are here
 ├── docs/
-│   ├── phase1-manual-setup.md         ← Full Phase 1 documentation + evidence
-│   ├── phase2-automated-response.md   ← Phase 2 (coming)
-│   └── architecture-diagram.png       ← Visual architecture
+│   ├── architecture-diagram.png           ← Full 3-phase architecture diagram
+│   ├── Phase1-Architecture-Overview.png   ← Phase 1 network layout
+│   ├── phase1-manual-setup.md             ← Phase 1 documentation + evidence
+│   ├── phase2-automated-response.md       ← Phase 2 documentation + evidence
+│   └── evidence/
+│       ├── 01-vpc-created.png
+│       ├── 02-ec2-instances-running.png
+│       ├── 03-attacker-box-details.png
+│       ├── 04-victim-server-details.png
+│       ├── 05-nmap-scan-terminal.png
+│       ├── 06-guardduty-findings.png
+│       ├── 07-vpc-flowlogs-enabled.png
+│       ├── 08-victim-sg-rules.png
+│       ├── 09-attacker-sg-rules.png
+│       ├── 10-cloudwatch-flowlogs.png
+│       ├── 11-hydra-brute-force.png
+│       ├── 12-nc-flood-terminal.png
+│       ├── 13-guardduty-4-findings.png
+│       ├── 14-lambda-function-overview.png
+│       ├── 15-lambda-code.png
+│       ├── 16-lambda-env-variables.png
+│       ├── 17-eventbridge-rule-pattern.png
+│       ├── 18-eventbridge-target-lambda.png
+│       ├── 19-iam-role-permissions.png
+│       ├── 20-sns-topic-subscription.png
+│       ├── 21-guardduty-finding-triggered.png
+│       ├── 22-cloudwatch-lambda-execution.png
+│       ├── 23-ec2-isolated-sg-applied.png
+│       └── 24-email-alert-received.png
 ├── lambda/
-│   └── incident_responder.py          ← Phase 2: Python isolation function
-├── terraform/
-│   ├── main.tf                        ← Phase 3: Full infrastructure
+│   └── incident_responder.py              ← Phase 2: Python isolation function
+├── terraform/                             ← Phase 3: IaC (coming)
+│   ├── main.tf
 │   ├── variables.tf
 │   └── outputs.tf
 └── .github/
     └── workflows/
-        └── tf-security-cicd.yml       ← Phase 3: CI/CD pipeline
+        └── tf-security-cicd.yml           ← Phase 3: CI/CD pipeline
 ```
 
 ---
@@ -136,8 +165,10 @@ cloud-threat-detection-lab/
 | Phase 1 | SSH hardening validated — password auth correctly rejected by victim | ✅ Confirmed |
 | Phase 1 | Root credential usage detected — `Policy:IAMUser/RootCredentialUsage` (Low) | ✅ Confirmed |
 | Phase 1 | VPC Flow Logs capturing all traffic in CloudWatch | ✅ Confirmed |
-| Phase 2 | Automated isolation via Lambda | 🚧 In progress |
-| Phase 2 | SNS alert on GuardDuty finding | 🚧 In progress |
+| Phase 2 | EventBridge → Lambda pipeline operational | ✅ Confirmed |
+| Phase 2 | victim-server isolated automatically via isolated-sg | ✅ Confirmed |
+| Phase 2 | SNS email alert received — 2026-07-05 14:04:32 UTC | ✅ Confirmed |
+| Phase 2 | Time from detection to isolation — under 30 seconds | ✅ Confirmed |
 | Phase 3 | Full Terraform IaC | 📋 Planned |
 | Phase 3 | GitHub Actions CI/CD with tfsec | 📋 Planned |
 
