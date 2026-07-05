@@ -14,29 +14,10 @@ and manually responds. That gap between detection and response is where breaches
 
 ## The Solution: A Serverless Response Pipeline
 
-Every GuardDuty finding now triggers an automated chain that runs in under 30 seconds —
-no human required, no manual login, no delay.
 
-```
-GuardDuty Finding (High/Medium severity)
-         │
-         ▼
-  EventBridge Rule
-  "threat-lab-guardduty-trigger"
-  catches every GuardDuty finding in real time
-         │
-         ▼
-  Lambda Function (Python / Boto3)
-  "threat-lab-incident-responder"
-  parses the finding, evaluates severity
-         │
-         ├──► EC2: Swap Security Group → isolated-sg
-         │    (zero inbound, zero outbound)
-         │    Instance is now completely cut off
-         │
-         └──► SNS → Email Alert
-              Full finding details delivered instantly
-```
+
+
+![Architecture Diagram](Phase2-Serverless-Solution.png)
 
 ---
 
