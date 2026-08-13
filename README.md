@@ -13,6 +13,44 @@ and brute-force attacks against an EC2 instance inside a private subnet.
 The system detects the attack using AWS-native security services and — in its final form —  
 automatically isolates the compromised instance in **under 30 seconds**, with no human intervention.
 
+The entire environment is defined as code and deploys with a single `terraform apply`.
+
+---
+
+## 🚀 Deploy It Yourself
+
+**Prerequisites:** an AWS account you control, [Terraform](https://developer.hashicorp.com/terraform/install) ≥ 1.5, [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) configured (`aws configure`), and an SSH key pair.
+
+```bash
+git clone https://github.com/youssef-talbi/cloud-threat-detection-lab.git
+cd cloud-threat-detection-lab/terraform
+
+# 1. Copy the example vars file and fill in YOUR values
+cp terraform.tfvars.example terraform.tfvars
+#    operator_ip     = "YOUR.PUBLIC.IP/32"   (get it from https://whatismyip.com)
+#    alert_email     = "you@example.com"
+#    public_key_path = "~/.ssh/id_rsa.pub"
+
+# 2. Deploy
+terraform init
+terraform plan
+terraform apply
+```
+
+**After `apply`:**
+1. **Confirm the SNS subscription** — AWS emails you a link. Click it, or you'll receive no alerts. *(Manual by design; AWS does not allow auto-confirmation.)*
+2. SSH into the attacker box (its public IP is in the `terraform output`).
+3. Run attacks against the victim's private IP:
+   ```bash
+   nmap -p 1-1000 -A -Pn <victim_private_ip>
+   for i in {1..200}; do (nc -w 1 <victim_private_ip> 22 2>/dev/null &); done
+   ```
+4. GuardDuty raises a finding → EventBridge fires the Lambda → the victim's Security Group is swapped to `isolated-sg` → you receive a `[HIGH]` alert email.
+
+**Clean up:** `terraform destroy`
+
+> ⚠️ **Notes:** `terraform.tfvars` and all `*.tfstate` files are **gitignored** — never commit them. This lab provisions **vulnerable-by-design** targets; deploy **only** in an isolated AWS account you control. GuardDuty deduplicates repeated findings on the same attacker→victim pair — on a fresh account the first attack triggers immediately.
+
 ---
 
 ## 🏗️ Engineering Evolution: Manual → Automated → IaC
@@ -71,19 +109,23 @@ Manual detection without automated response is not enough. A real attack at 3 AM
 
 ---
 
-### 🔹 Phase 3 — Infrastructure as Code & CI/CD 🚧 `PLANNED`
+### 🔹 Phase 3 — Infrastructure as Code & CI/CD ✅ `COMPLETE`
 
 **The problem this phase addresses:**  
 Manual setup is not reproducible and not reviewable by a team.
 
-**What will be built:**
-- Full Terraform refactor of all Phase 1 + Phase 2 infrastructure
-- `tfsec` scanning Terraform configs for misconfigurations before deployment
-- GitHub Actions CI/CD pipeline: push → tfsec scan → `terraform plan` → `terraform apply`
-- Complete GitOps deployment — one command rebuilds the entire lab from scratch
+**What was built:**
+- Full Terraform refactor of all Phase 1 + Phase 2 infrastructure — 30 resources across 8 files split by concern
+- Existing GuardDuty detector adopted into Terraform state via `terraform import` (real IaC adoption, no history lost)
+- GitHub Actions CI/CD pipeline running `terraform fmt`, `validate`, and a `tfsec` security scan on every change to `terraform/`
+- Secrets (`terraform.tfvars`, state files) excluded from version control via `.gitignore`
 
-**Expected outcome:**  
-Entire lab deployable in minutes from a single `terraform apply`, with security scanning built into every deployment.
+**Real results confirmed:**
+- Entire lab provisioned from a single `terraform apply` — `30 added, 0 changed, 0 destroyed`
+- Every resource carries the `ManagedBy: Terraform` tag in the AWS Console
+- Detection-and-response pipeline re-validated end to end: victim isolated (`victim-sg → isolated-sg`) with a `[HIGH]` alert email in under one second
+
+→ [Full Phase 3 Documentation & Evidence](docs/phase3-terraform-cicd.md)
 
 ---
 
@@ -144,7 +186,8 @@ cloud-threat-detection-lab/
 │       └── 24-email-alert-received.png
 ├── lambda/
 │   └── incident_responder.py              ← Phase 2: Python isolation function
-├── terraform/                             ← Phase 3: IaC (coming)
+├── terraform/                             ← Phase 3: Infrastructure as Code (main, vpc, security, compute, detection, response, outputs)
+├── terraform.tfvars.example               ← Template for your own values (real tfvars is gitignored)
 │   ├── main.tf
 │   ├── variables.tf
 │   └── outputs.tf
@@ -169,8 +212,10 @@ cloud-threat-detection-lab/
 | Phase 2 | victim-server isolated automatically via isolated-sg | ✅ Confirmed |
 | Phase 2 | SNS email alert received — 2026-07-05 14:04:32 UTC | ✅ Confirmed |
 | Phase 2 | Time from detection to isolation — under 30 seconds | ✅ Confirmed |
-| Phase 3 | Full Terraform IaC | 📋 Planned |
-| Phase 3 | GitHub Actions CI/CD with tfsec | 📋 Planned |
+| Phase 3 | Full lab provisioned from a single `terraform apply` (30 resources) | ✅ Confirmed |
+| Phase 3 | Existing GuardDuty imported into Terraform state | ✅ Confirmed |
+| Phase 3 | GitHub Actions CI/CD with tfsec security scanning | ✅ Confirmed |
+| Phase 3 | Automated isolation re-validated on IaC-built infra | ✅ Confirmed |
 
 ---
 
@@ -180,4 +225,4 @@ cloud-threat-detection-lab/
 Cloud Security Engineering Student — TEK-UP University (2027)  
 RHCSA · eJPTv2 · AWS Solutions Architect Associate  
 
-[LinkedIn](https://linkedin.com/in/talbi-youssef) · [GitHub](https://github.com/YOUR_USERNAME)
+[LinkedIn](https://linkedin.com/in/talbi-youssef) · [GitHub](https://github.com/youssef-talbi)
