@@ -1,0 +1,6 @@
+# Copy this file to terraform.tfvars and fill in your own values.
+# terraform.tfvars is gitignored — never commit your real values.
+
+operator_ip     = "YOUR.PUBLIC.IP/32"   # get it from https://whatismyip.com, add /32
+alert_email     = "you@example.com"      # where SNS security alerts are sent
+public_key_path = "~/.ssh/id_rsa.pub"    # path to your SSH public key

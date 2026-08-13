@@ -1,0 +1,19 @@
+# Terraform state & vars
+**/*.tfstate
+**/*.tfstate.backup
+**/terraform.tfvars
+**/.terraform/
+**/.terraform.lock.hcl
+**/lambda_function.zip
+**/ziptest/
+
+# Test artifacts
+payload.json
+response.json
+**/payload.json
+**/response.json
+
+# SSH keys
+*.pem
+*.key
+id_rsa*
