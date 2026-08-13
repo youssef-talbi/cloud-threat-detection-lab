@@ -4,7 +4,7 @@
 
 # ── GuardDuty ──
 resource "aws_guardduty_detector" "lab" {
-  enable = true
+  enable                       = true
   finding_publishing_frequency = "FIFTEEN_MINUTES"
   datasources {
     s3_logs {
