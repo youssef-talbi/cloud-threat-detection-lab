@@ -198,4 +198,4 @@ This means:
 with a GitHub Actions CI/CD pipeline that scans for security issues
 before any deployment.
 
-→ [Phase 3 Documentation](phase3-terraform-cicd.md) *(coming soon)*
+→ [Phase 3 Documentation](phase3-terraform-cicd.md)
