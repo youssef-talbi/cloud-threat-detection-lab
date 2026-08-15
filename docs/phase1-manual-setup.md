@@ -218,4 +218,4 @@ Phase 2 introduces automated incident response: EventBridge catches every GuardD
 triggers a Python Lambda function, and automatically isolates the compromised instance  
 by replacing its Security Group with `isolated-sg` — in under 30 seconds.
 
-→ [Phase 2 Documentation](phase2-automated-response.md) *(coming soon)*
+→ [Phase 2 Documentation](phase2-automated-response.md)
